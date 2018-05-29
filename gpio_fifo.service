@@ -1,0 +1,10 @@
+[Unit]
+Description=GPIO FIFO listener
+
+[Service]
+Type=simple
+Restart=Always
+ExecStart=/usr/local/sbin/gpio_fifo.py
+
+[Install]
+WantedBy=multi-user.target
