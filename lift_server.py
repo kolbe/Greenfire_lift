@@ -2,9 +2,11 @@
 import BaseHTTPServer
 import SocketServer
 import urlparse
+import ssl
 
 PORT = 8000
 FIFO = "/var/run/gpio.fifo"
+auth_token = '7t8ufm4HsEZdrnid'
 
 html = '''
 <html>
@@ -50,9 +52,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return
         with open(FIFO, "a") as fifo:
             fifo.write(cmd + "\n")
-            fifo.close()
         
-
     def do_HEAD(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -60,23 +60,27 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse.urlparse(self.path)
         params = urlparse.parse_qs(parsed_path.query)
-	if self.path == "/greenfire.png":
-            icon = open("/usr/local/share/greenfire.png",'r')
-            self.send_response(200)
-            self.send_header("Content-type", "image/png")
+        if ("auth" not in params) or (params['auth'][0] != auth_token):
+            self.send_response(403)
+            self.send_header("Content-type", "text/plain")
             self.end_headers()
-            self.wfile.write(icon.read())
-            icon.close()
+            self.wfile.write("Unauthorized access forbidden.\n")
+        elif self.path == "/greenfire.png":
+            with open("/usr/local/share/greenfire.png",'r') as icon:
+                self.send_response(200)
+                self.send_header("Content-type", "image/png")
+                self.end_headers()
+                self.wfile.write(icon.read())
         elif "cmd" in params and ( params['cmd'][0] == "u" or params['cmd'][0] == "d" ):
             self.send_cmd(params['cmd'][0])
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html)
-        self.wfile.close()
-        
+        else:
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(html)
+
 try:
     server = BaseHTTPServer.HTTPServer(("", PORT), MyHandler)
+    server.socket = ssl.wrap_socket(server.socket, certfile='/home/chip/greenfire-remote.crt', keyfile='/home/chip/greenfire-remote.key', server_side=True)
     print('Started http server')
     server.serve_forever()
 except KeyboardInterrupt:

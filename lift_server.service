@@ -4,7 +4,7 @@ Requires=gpio_fifo.service
 
 [Service]
 Type=simple
-Restart=Always
+Restart=always
 ExecStart=/usr/local/sbin/lift_server.py
 
 [Install]
