@@ -72,8 +72,10 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(icon.read())
         elif "cmd" in params and ( params['cmd'][0] == "u" or params['cmd'][0] == "d" ):
+            self.send_response(200)
             self.send_cmd(params['cmd'][0])
         else:
+            self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(html)
