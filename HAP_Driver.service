@@ -1,0 +1,19 @@
+[Unit]
+Description = HAP (HomeKit) daemon
+#Wants = pigpiod.service  # Remove this if you don't depend on pigpiod
+After = local-fs.target network-online.target
+#After = pigpiod.service
+
+[Service]
+WorkingDirectory = /home/chip/git/kolbe/greenfire_lift
+Restart=always
+# It's a good idea to use some unprivileged system user
+User = chip
+# Script starting HAP-python, e.g. main.py
+# Be careful to set any paths you use, e.g. for persisting the state.
+#Environment=PYTHONPATH=/home/pi/.local/lib/python3.5/site-packages/
+ExecStart = /home/chip/.pyenv/versions/3.5.6/bin/python3 /home/chip/git/kolbe/greenfire_lift/hap_driver.py
+
+[Install]
+WantedBy = multi-user.target
+
