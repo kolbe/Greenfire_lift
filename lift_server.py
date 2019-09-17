@@ -3,6 +3,7 @@ import BaseHTTPServer
 import SocketServer
 import urlparse
 import ssl
+import os
 
 PORT = 8000
 FIFO = "/var/run/gpio.fifo"
@@ -50,8 +51,9 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def send_cmd(self, cmd):
         if cmd != "u" and cmd != "d":
             return
-        with open(FIFO, "a") as fifo:
-            fifo.write(cmd + "\n")
+        if os.path.exists(FIFO):
+            with open(FIFO, "a") as fifo:
+                fifo.write(cmd + "\n")
         
     def do_HEAD(self):
         self.send_response(200)
@@ -66,7 +68,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write("Unauthorized access forbidden.\n")
         elif self.path == "/greenfire.png":
-            with open("/usr/local/share/greenfire.png",'r') as icon:
+            with open("/home/pi/git/Greenfire_lift/greenfire.png",'r') as icon:
                 self.send_response(200)
                 self.send_header("Content-type", "image/png")
                 self.end_headers()
@@ -82,7 +84,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 try:
     server = BaseHTTPServer.HTTPServer(("", PORT), MyHandler)
-    server.socket = ssl.wrap_socket(server.socket, certfile='/home/chip/greenfire-remote.crt', keyfile='/home/chip/greenfire-remote.key', server_side=True)
+    server.socket = ssl.wrap_socket(server.socket, certfile='/home/pi/greenfire-remote.crt', keyfile='/home/pi/greenfire-remote.key', server_side=True)
     print('Started http server')
     server.serve_forever()
 except KeyboardInterrupt:

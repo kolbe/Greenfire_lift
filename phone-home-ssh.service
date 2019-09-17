@@ -4,7 +4,6 @@ ConditionPathExists=|/usr/bin
 After=network.target
 
 [Service]
-User=chip
 ExecStart=/usr/bin/ssh -NTC -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=yes -R 12422:localhost:22 greenfire@easy.uselesstrash.com
 
 # Restart every >2 seconds to avoid StartLimitInterval failure
@@ -12,4 +11,4 @@ RestartSec=3
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

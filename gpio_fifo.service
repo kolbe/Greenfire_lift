@@ -4,7 +4,7 @@ Description=GPIO FIFO listener
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/sbin/gpio_fifo.py
+ExecStart=/home/pi/git/Greenfire_lift/gpio_fifo_rpi.py
 
 [Install]
 WantedBy=multi-user.target

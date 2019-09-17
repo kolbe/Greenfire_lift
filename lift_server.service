@@ -1,11 +1,11 @@
 [Unit]
 Description=Lift HTTP listener
-Requires=gpio_fifo.service
 
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/sbin/lift_server.py
+RestartSec=3
+ExecStart=/home/pi/git/Greenfire_lift/lift_server.py
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
